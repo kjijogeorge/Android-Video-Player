@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+       <EditText
+           android:id="@+id/EditTextSongURL"
+           android:layout_width="0dp"
+           android:layout_height="40dp"
+           android:layout_alignParentLeft="true"
+           android:layout_toLeftOf="@+id/buttonGo"
+           android:inputType="textUri" />
+
+        <Button
+            android:id="@+id/buttonGo"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:text="@string/go" />
+
+	    <SurfaceView
+	        android:id="@+id/surfacePlayer"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:layout_alignParentBottom="true"
+	        android:layout_alignParentLeft="true"
+	        android:layout_below="@+id/EditTextSongURL"
+	        android:paddingTop="5dp"
+	        android:visibility="visible" />
+
+</RelativeLayout>
