@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item android:id="@+id/brightness" 
+    	  android:title="@string/brightness" />
+    
+    <item android:id="@+id/bitrate" 
+    	  android:title="@string/bitrate" />
+ </menu>

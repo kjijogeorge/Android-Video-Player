@@ -3,4 +3,6 @@
     <string name="hello">PlayingVideo</string>
     <string name="app_name">Playing Video</string>
     <string name="go">GO</string>
+    <string name="brightness">Brightness</string>
+    <string name="bitrate">Bitrate</string>
 </resources>
