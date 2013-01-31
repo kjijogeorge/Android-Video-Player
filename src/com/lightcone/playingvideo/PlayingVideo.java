@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -11,7 +13,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -278,17 +279,48 @@ public class PlayingVideo extends Activity implements OnCompletionListener, OnPr
        // AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
      
         switch (item.getItemId()) {
+        case ID_MENU_PRESENT:
+        	 	videoPlayer.start();
+        	 	return true;
         case R.id.brightness:
-        	 Toast.makeText(this, "You have chosen the " + item.getTitle().toString() + " menu option",
-                     Toast.LENGTH_SHORT).show();
-        	 return true;
-        case R.id.bitrate:
-       	 	 Toast.makeText(this, "You have chosen the " + item.getTitle().toString() + " menu option",
+	        	videoPlayer.pause(); 
+        		try {	
+	        		 curBrightness = android.provider.Settings.System.getInt(getContentResolver(), 
+	        				 android.provider.Settings.System.SCREEN_BRIGHTNESS);
+	        		 BrightDialogue bDialog = BrightDialogue.newInstance(curBrightness, editTextSongURL.getText().toString());
+	     			 bDialog.show(getFragmentManager(), "bDialog");
+	        	 } catch (SettingNotFoundException e) {
+					e.printStackTrace();
+	        	 	}
+				 return true;
+        
+     /*   case R.id.bitrate:
+        	 String[] temp = editTextSongURL.getText().toString().split(".webm");
+        	 temp[0] += "_2000.webm";
+        	 editTextSongURL.setText(temp[0]);
+        	 Toast.makeText(this, "The bitrate is " + bRate,
                     Toast.LENGTH_SHORT).show();
-       	 	 return true;
+     		 Log.d(TAG, "String is " + temp[0] + "bitrate " + bRate );
+     		 videoPlayer.release();
+     		 playVideo();
+       	 	 return true;*/
+       	 	 
+       // default: return super.onContextItemSelected(item);
         }
         return false;
     }
-		
+    
+    private double BatteryCalc() {
+    	Intent batteryIntent = getApplicationContext().registerReceiver(null,
+                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+	    int rawlevel = batteryIntent.getIntExtra("level", -1);
+	    double scale = batteryIntent.getIntExtra("scale", -1);
+	    double level = -1;
+	    if (rawlevel >= 0 && scale > 0) {
+	    level = rawlevel / scale;
+	    }
+	    return level;
+    } 
+  	
 }
 	
