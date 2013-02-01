@@ -52,6 +52,7 @@ public class PlayingVideo extends Activity implements OnCompletionListener, OnPr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
                
+        
         surfaceView = (SurfaceView)findViewById(R.id.surfacePlayer);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
@@ -65,10 +66,13 @@ public class PlayingVideo extends Activity implements OnCompletionListener, OnPr
         	public void onClick(final View v) {
         		        		       		
         		if(videoPlayer!=null && videoPlayer.isPlaying()){
-	        	    	videoPlayer.stop();
+        				//videoPlayer.stop();
+	        	    	videoPlayer.reset();
 	        			Log.e(TAG, "Media Player is busy.Please try after sometime");
-	        			return;
+	        			Toast.makeText(getBaseContext(), "Media Player is busy.Please try after sometime",
+	                            Toast.LENGTH_SHORT).show();
         	    }	
+        		
         		
         		Log.d(TAG, "File played :  " + editTextSongURL.getText().toString());
         		playVideo(editTextSongURL.getText().toString());
@@ -99,7 +103,9 @@ public class PlayingVideo extends Activity implements OnCompletionListener, OnPr
     		videoPlayer.prepare();
     		videoPlayer.setOnPreparedListener(this);
     		videoPlayer.setOnCompletionListener(this);
+    		//videoPlayer.setOnErrorListener((OnErrorListener) this);
     		metaRetriever.setDataSource(url);
+    		
     		bRate = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE))/1000.0;
     		mController = new MediaController(this);
     	
@@ -257,8 +263,9 @@ public class PlayingVideo extends Activity implements OnCompletionListener, OnPr
 			 curBrightness = android.provider.Settings.System.getInt(getContentResolver(), android.provider.Settings.System.SCREEN_BRIGHTNESS);
 		} catch (SettingNotFoundException e) {
 			e.printStackTrace();
-		  }
-		 
+		}
+        
+        videoPlayer.pause();  
         menu.setHeaderTitle("Switch context");
         bLevel = BatteryCalc();
         rTime = BATTERY_CONST - (curBrightness * BRIGHT_CONST + bRate * BITRATE_CONST);
@@ -269,9 +276,7 @@ public class PlayingVideo extends Activity implements OnCompletionListener, OnPr
         		(int)Math.round(rTime) / 60 + "hr " +
 				(int)Math.round(rTime) % 60 +" min)");
         
-        menu.add(0, R.id.brightness, 0, "Brightness"+ "_time");
-
-        menu.add(0, R.id.bitrate, 0, "Bitrate"+ "_time");
+        menu.add(0, R.id.brightness, 0, "Change Config");
     }
     
     @Override
@@ -283,16 +288,16 @@ public class PlayingVideo extends Activity implements OnCompletionListener, OnPr
         	 	videoPlayer.start();
         	 	return true;
         case R.id.brightness:
-	        	videoPlayer.pause(); 
-        		try {	
+	        	try {	
 	        		 curBrightness = android.provider.Settings.System.getInt(getContentResolver(), 
 	        				 android.provider.Settings.System.SCREEN_BRIGHTNESS);
 	        		 BrightDialogue bDialog = BrightDialogue.newInstance(curBrightness, editTextSongURL.getText().toString());
 	     			 bDialog.show(getFragmentManager(), "bDialog");
+	     			 videoPlayer.reset();
 	        	 } catch (SettingNotFoundException e) {
 					e.printStackTrace();
 	        	 	}
-				 return true;
+				return true;
         
      /*   case R.id.bitrate:
         	 String[] temp = editTextSongURL.getText().toString().split(".webm");

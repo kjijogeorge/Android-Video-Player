@@ -129,17 +129,18 @@ public class BrightDialogue extends DialogFragment {
 
         	 }});
         
-        
         radioGroup = (RadioGroup)v.findViewById(R.id.radiogroup);
         radioGroup.check(R.id.rbMedium);
-        //int checkedRadioButton = radioGroup.getCheckedRadioButtonId();
-        final String[] temp = textUrl.split("_");
-        
         
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
         {
-        	String radioButtonSelected = "";
+        	
+            //int checkedRadioButton = radioGroup.getCheckedRadioButtonId();
+            //String[] temp = textUrl.split("_");
+            String radioButtonSelected = "";
+            
         	public void onCheckedChanged (RadioGroup group, int checkedId) {
+        		String[] temp = textUrl.split("_");
                 switch (checkedId) {
                 case R.id.rbLow : 
                 		radioButtonSelected = "Bitrate_Low";
@@ -158,6 +159,7 @@ public class BrightDialogue extends DialogFragment {
 				        break;
                 }
                 Log.d(TAG, "File Selected is " + temp[0] );
+                textUrl = temp[0];
                 metaRetriever.setDataSource(temp[0]);
         		bRate = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE))/1000.0;
         		 try {
@@ -174,8 +176,7 @@ public class BrightDialogue extends DialogFragment {
         	
         });
         
-        
-                
+              
         return new AlertDialog.Builder(getActivity())
                 .setTitle("Change Brightness and Bitrate...")
                 .setView(v)
@@ -185,11 +186,9 @@ public class BrightDialogue extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                     	setBrightness(v , BrightValue);
                     	currentBrightness = BrightValue;
-                    	Log.d(TAG, "File played :  " + temp[0]);
-                    	PlayingVideo.editTextSongURL.setText(temp[0]);
-                        PlayingVideo.buttonPlay.performClick();
-                        
-                    	
+                    	Log.d(TAG, "File played :  " + textUrl);
+                    	PlayingVideo.editTextSongURL.setText(textUrl);
+   	     			 	PlayingVideo.buttonPlay.performClick();
                     }
                 })
                 .setNegativeButton("Cancel!", new DialogInterface.OnClickListener() {
@@ -219,16 +218,20 @@ public class BrightDialogue extends DialogFragment {
 	        }
 	        
 	        final Window window = ((Activity) view.getContext()).getWindow();
-	        Log.d(TAG, "Change brightness to " + bright);
-	        LayoutParams layoutpars = window.getAttributes();
-			// set the brightness of this window
-			layoutpars.screenBrightness = Float.valueOf(bright) * (1f / 255f);
-			// apply attribute changes to this window
-			window.setAttributes(layoutpars);
-			Uri uri = android.provider.Settings.System.getUriFor("screen_brightness");
-			android.provider.Settings.System.putInt(cResolver, "screen_brightness",
-			           bright);
-			cResolver.notifyChange(uri, null);
+	        if(bright >=10)
+	        	{
+	        		Log.d(TAG, "Change brightness to " + bright);
+	        		LayoutParams layoutpars = window.getAttributes();
+	    			// set the brightness of this window
+	    			layoutpars.screenBrightness = Float.valueOf(bright) * (1f / 255f);
+	    			// apply attribute changes to this window
+	    			window.setAttributes(layoutpars);
+	    			Uri uri = android.provider.Settings.System.getUriFor("screen_brightness");
+	    			android.provider.Settings.System.putInt(cResolver, "screen_brightness",
+	    			           bright);
+	    			cResolver.notifyChange(uri, null);
+	        	}
+	        
 	    }
 	 
 	 private double BatteryCalc(Context context) {
