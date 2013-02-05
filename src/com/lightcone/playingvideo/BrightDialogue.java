@@ -22,6 +22,7 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lightcone.playingvideo.PlayingVideo;
 
@@ -29,7 +30,6 @@ public class BrightDialogue extends DialogFragment {
 
 	private static String TAG="Bright Dialog";
 	
-	PlayingVideo pv ;
 	private static final double BATTERY_CONST = 313;
 	private static final double BRIGHT_CONST = 0.8892;
 	private static final double BITRATE_CONST = 0.0156;
@@ -38,7 +38,7 @@ public class BrightDialogue extends DialogFragment {
     int BrightValue;
 	static String textUrl;
 	SeekBar editTextBrightness = null;
-	TextView textViewBrightness = null;
+	TextView textViewTime = null;
 	RadioGroup radioGroup;
 	double bRate;
 	double rTime;
@@ -66,9 +66,8 @@ public class BrightDialogue extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         final View v = inflater.inflate(R.layout.bright_layout, null);
-        bLevel = BatteryCalc(v.getContext());
         
-        textViewBrightness = (TextView)v.findViewById(R.id.textViewBrightness);
+        textViewTime = (TextView)v.findViewById(R.id.textViewTime);
         editTextBrightness = (SeekBar)v.findViewById(R.id.editTextBrightness);
         
         /*editTextBrightness.addTextChangedListener(new TextWatcher(){
@@ -118,10 +117,11 @@ public class BrightDialogue extends DialogFragment {
         	 @Override
         	 public void onStopTrackingTouch(SeekBar arg0) {
         		 try {
-					 rTime = BATTERY_CONST - (BrightValue * BRIGHT_CONST + bRate * BITRATE_CONST);
+        		     bLevel = BatteryCalc(v.getContext());
+        		     rTime = BATTERY_CONST - (BrightValue * BRIGHT_CONST + bRate * BITRATE_CONST);
 					 rTime = rTime * bLevel; 
 					 Log.d(TAG, "Value of bitrate is " + bRate );
-					 textViewBrightness.setText("Running time:" + 
+					 textViewTime.setText("Running time:" + 
 								 (int)Math.round(rTime) / 60 + "hr " +
 								 (int)Math.round(rTime) % 60 +" min)");
 				 } catch (NumberFormatException e){ }
@@ -160,13 +160,19 @@ public class BrightDialogue extends DialogFragment {
                 }
                 Log.d(TAG, "File Selected is " + temp[0] );
                 textUrl = temp[0];
-                metaRetriever.setDataSource(temp[0]);
-        		bRate = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE))/1000.0;
-        		 try {
+               
+                try {
+	                metaRetriever.setDataSource(temp[0]);
+	        		bRate = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE))/1000.0;
+	        	 } catch(Exception e) {
+                Log.e(TAG, "Fails to setDataSource for file " + temp[0]);
+	        	 }  
+        		
+        		try {
 					 rTime = BATTERY_CONST - (BrightValue * BRIGHT_CONST + bRate * BITRATE_CONST);
 					 rTime = rTime * bLevel; 
 					 Log.d(TAG, "Value of bitrate is " + bRate );
-					 textViewBrightness.setText("Running time:" + 
+					 textViewTime.setText("Running time:" + 
 								 (int)Math.round(rTime) / 60 + "hr " +
 								 (int)Math.round(rTime) % 60 +" min)");
 				 } catch (NumberFormatException e){ }
@@ -189,6 +195,12 @@ public class BrightDialogue extends DialogFragment {
                     	Log.d(TAG, "File played :  " + textUrl);
                     	PlayingVideo.editTextSongURL.setText(textUrl);
    	     			 	PlayingVideo.buttonPlay.performClick();
+   	     			 	Toast.makeText( v.getContext(), "Brightness : " + currentBrightness +
+   	     			 		"\nBitrate : " + bRate + 
+   	     			 		"\nRunning Time : " 
+   	     			 		+ (int)Math.round(rTime) / 60 + "hr " 
+   	     			 		+ (int)Math.round(rTime) % 60 +" min",
+   	     			 		Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("Cancel!", new DialogInterface.OnClickListener() {
